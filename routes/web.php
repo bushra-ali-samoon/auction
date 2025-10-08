@@ -18,6 +18,6 @@ Route::post('register', [RegisterController::class, 'register'])->name('register
 
 
 Route::resource('auctions', AuctionController::class)->middleware('auth'); 
-Route::get('/home', function () {
-    return view('home');
-})->middleware('auth')->name('home');
+
+Route::view('/home', 'home')->name('home');
+
