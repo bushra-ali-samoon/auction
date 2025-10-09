@@ -1,5 +1,3 @@
-<!-- resources/views/auctions/index.blade.php -->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,32 +19,35 @@
     @endif
 
     @if($auctions->count() > 0)
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>Title</th>
-                    <th>Starting Price</th>
-                    <th width="200">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($auctions as $auction)
-                    <tr>
-                        <td>{{ $auction->title }}</td>
-                        <td>${{ $auction->starting_price }}</td>
-                        <td>
-                            <a href="{{ route('auctions.show', $auction->id) }}" class="btn btn-info btn-sm">View</a>
-                            <a href="{{ route('auctions.edit', $auction->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                            <form action="{{ route('auctions.destroy', $auction->id) }}" method="POST" style="display:inline-block;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+      <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Starting Price</th>
+            <th>Status</th>
+            <th width="200">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($auctions as $auction)
+            <tr>
+                <td>{{ $auction->title }}</td>
+                <td>${{ $auction->starting_price }}</td>
+                <td>{{ $auction->currentStatus() }}</td>
+                <td>
+                    <a href="{{ route('auctions.show', $auction->id) }}" class="btn btn-info btn-sm">View</a>
+                    <a href="{{ route('auctions.edit', $auction->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <form action="{{ route('auctions.destroy', $auction->id) }}" method="POST" style="display:inline-block;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
     @else
         <p class="text-muted text-center">No auctions found.</p>
     @endif

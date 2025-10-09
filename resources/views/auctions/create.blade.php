@@ -34,7 +34,15 @@
                 <label class="form-label">Starting Price</label>
                 <input type="number" name="starting_price" class="form-control" value="{{ old('starting_price') }}" placeholder="Enter starting price" required>
             </div>
+            <div class="mb-3">
 
+            <label>Auction Start</label><br>
+            <input type="datetime-local" name="auction_start" value="{{ old('auction_start') }}" required><br><br>
+</div>
+<div class="mb-3">
+            <label>Auction End</label><br>
+            <input type="datetime-local" name="auction_end" value="{{ old('auction_end') }}" required><br><br>
+</div>
             <div class="text-center">
                 <button type="submit" class="btn btn-primary px-4">Create Auction</button>
                 <a href="{{ route('auctions.index') }}" class="btn btn-secondary px-4">Back</a>
