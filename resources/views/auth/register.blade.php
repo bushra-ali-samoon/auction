@@ -36,7 +36,11 @@
 
         <label>Confirm Password</label><br>
         <input type="password" name="password_confirmation" required><br><br>
-
+        <label for="role">Role</label>
+        <select name="role" required>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+        </select>
  
 
         <button type="submit">Register</button>
