@@ -14,25 +14,27 @@ class Auction extends Model
     return $this->hasMany(Bid::class);
 }
  
-
-public function currentStatus()
-{
-    $now = Carbon::now();
-
-    // If dates are not set
-    if (!$this->auction_start || !$this->auction_end) {
-        return 'pending
-    ';
+public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
+// public function currentStatus()
+// {
+//     $now = Carbon::now();
 
-    if ($now->lt($this->auction_start)) {
-        return 'Not Started';
-    } elseif ($now->between($this->auction_start, $this->auction_end)) {
-        return 'Ongoing';
-    } else {
-        return 'Expired';
-    }
-}
+//     // If dates are not set
+//     if (!$this->auction_start || !$this->auction_end) {
+//         return 'pending';
+//     }
+
+//     if ($now->lt($this->auction_start)) {
+//         return 'Not Started';
+//     } elseif ($now->between($this->auction_start, $this->auction_end)) {
+//         return 'Ongoing';
+//     } else {
+//         return 'Expired';
+//     }
+// }
 
 
 }

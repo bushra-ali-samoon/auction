@@ -23,5 +23,6 @@ Route::resource('auctions', AuctionController::class)->middleware('auth');
 
 Route::post('/auctions/{auction}/bid', [BidController::class, 'store'])->name('bids.store');
 
+Route::get('/bids/{bid}/accept', [AuctionController::class, 'acceptBid'])->name('bids.accept');
 Route::view('/home', 'home')->name('home');
 
