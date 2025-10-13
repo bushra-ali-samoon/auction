@@ -20,7 +20,7 @@ class MessageController extends Controller
         $recipient = User::findOrFail($targetId); 
 
         
-        // We look for messages where BOTH the sender_id and receiver_id 
+        // look for messages where BOTH the sender_id and receiver_id 
         // are one of the two IDs involved in the chat.
         $messages = Message::whereIn('sender_id', [$currentId, $targetId])
             ->whereIn('receiver_id', [$currentId, $targetId])
