@@ -1,44 +1,37 @@
-<!-- resources/views/auctions/edit.blade.php -->
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Auction</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
+@section('title', 'Edit Auction')
 
-<div class="container mt-5">
-    <h2 class="mb-4">Edit Auction</h2>
+@section('content')
+<h2>Edit Auction</h2>
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+<form method="POST" action="{{ route('auctions.update', $auction->id) }}">
+    @csrf
+    @method('PUT')
 
-    <form action="{{ route('auctions.update', $auction->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" value="{{ $auction->title }}" required>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Title</label>
-            <input type="text" name="title" class="form-control" value="{{ old('title', $auction->title) }}" required>
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Starting Price</label>
+        <input type="number" name="starting_price" class="form-control" step="0.01" value="{{ $auction->starting_price }}" required>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Starting Price</label>
-            <input type="number" name="starting_price" class="form-control" value="{{ old('starting_price', $auction->starting_price) }}" required>
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Auction Start Time</label>
+        <input type="datetime-local" name="auction_start" class="form-control"
+            value="{{ \Carbon\Carbon::parse($auction->auction_start)->format('Y-m-d\TH:i') }}">
+    </div>
 
-        <button type="submit" class="btn btn-primary">Update Auction</button>
-        <a href="{{ route('auctions.index') }}" class="btn btn-secondary">Back</a>
-    </form>
-</div>
+    <div class="mb-3">
+        <label class="form-label">Auction End Time</label>
+        <input type="datetime-local" name="auction_end" class="form-control"
+            value="{{ \Carbon\Carbon::parse($auction->auction_end)->format('Y-m-d\TH:i') }}">
+    </div>
 
-</body>
-</html>
+    <button type="submit" class="btn btn-success">Update Auction</button>
+    <a href="{{ route('auctions.index') }}" class="btn btn-secondary">Back</a>
+</form>
+@endsection
