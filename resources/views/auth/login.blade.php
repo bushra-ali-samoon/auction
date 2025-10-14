@@ -2,33 +2,22 @@
 <html>
 <head>
     <title>Login</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h2>Login</h2>
 
-    @if ($errors->any())
-        <div style="color:red;">
-            <ul>
-                @foreach ($errors->all() as $e)
-                    <li>{{ $e }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    {{-- Success & Error messages --}}
+    <div id="successMsg" style="color:green;"></div>
+    <div id="errorMsg" style="color:red;"></div>
 
-    @if(session('success'))
-        <div style="color:green;">{{ session('success') }}</div>
-    @endif
-
-    <form method="POST" action="{{ route('login.submit') }}">
+    <form id="loginForm">
         @csrf
-        <label>Email</label><br>
-        <input type="email" name="email" value="{{ old('email') }}" required><br><br>
-
-        <label>Password</label><br>
-        <input type="password" name="password" required><br><br>
-
+        <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required><br><br>
+        <input type="password" name="password" placeholder="Password" required><br><br>
         <button type="submit">Login</button>
     </form>
+
+ 
 </body>
 </html>

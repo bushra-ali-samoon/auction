@@ -2,48 +2,29 @@
 <html>
 <head>
     <title>Register</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h2>Register</h2>
 
-    @if ($errors->any())
-        <div style="color:red;">
-            <ul>
-                @foreach ($errors->all() as $e)
-                    <li>{{ $e }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    {{-- Success & Error messages --}}
+    <div id="successMsg" style="color:green;"></div>
+    <div id="errorMsg" style="color:red;"></div>
 
-    @if(session('success'))
-        <div style="color:green;">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('register.submit') }}">
+    <form id="registerForm">
         @csrf
-
-        <label>Name</label><br>
-        <input type="text" name="name" value="{{ old('name') }}" required><br><br>
-
-        <label>Email</label><br>
-        <input type="email" name="email" value="{{ old('email') }}" required><br><br>
-
-        <label>Password</label><br>
-        <input type="password" name="password" required><br><br>
-
-        <label>Confirm Password</label><br>
-        <input type="password" name="password_confirmation" required><br><br>
-        <label for="role">Role</label>
+        <input type="text" name="name" placeholder="Name" value="{{ old('name') }}" required><br><br>
+        <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required><br><br>
+        <input type="password" name="password" placeholder="Password" required><br><br>
+        <input type="password" name="password_confirmation" placeholder="Confirm Password" required><br><br>
         <select name="role" required>
+            <option value="">Select Role</option>
             <option value="buyer">Buyer</option>
             <option value="seller">Seller</option>
-        </select>
- 
-
+        </select><br><br>
         <button type="submit">Register</button>
     </form>
+
+ 
 </body>
 </html>

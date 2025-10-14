@@ -2,53 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Message;
+
 
 class MessageController extends Controller
 {
-     
-    //   Show the chat between the logged-in user and the user $targetId.
-     
-    public function show($targetId)
+    // Show chat between current user and selected user
+    public function show($id)
     {
-        $currentId = Auth::id();
-        
-        // Find the person we are chatting with, or fail if they don't exist
-        $recipient = User::findOrFail($targetId); 
+        $user = Auth::id();
+        $partner = User::findOrFail($id);
 
-        
-        // look for messages where BOTH the sender_id and receiver_id 
-        // are one of the two IDs involved in the chat.
-        $messages = Message::whereIn('sender_id', [$currentId, $targetId])
-            ->whereIn('receiver_id', [$currentId, $targetId])
-            ->with('sender') 
+        // Get all messages between both users
+        $messages = Message::whereIn('sender_id', [$user, $id])
+            ->whereIn('receiver_id', [$user, $id])
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Pass the list of messages and the recipient's info to the view
-        return view('messages.show', compact('messages', 'recipient'));
+        //   Pass both $partner and $id to the view
+        return view('messages.show', compact('messages', 'partner', 'id'));
     }
 
-    /**
-     * Save the new message.
-     */
-    public function store(Request $request)
+    // Send message using AJAX
+    public function store(Request $r)
     {
-        // Always validate what comes from the user!
-        $request->validate([
-            'message' => 'required|string|max:1000', 
-            'receiver_id' => 'required|numeric|exists:users,id'
-        ]);
-
+  
         Message::create([
             'sender_id' => Auth::id(),
-            'receiver_id' => $request->receiver_id,
-            'message' => $request->message
+            'receiver_id' => $r->receiver_id,
+            'message' => $r->message
         ]);
 
-        return back(); // Go back to the chat.
+        return response()->json(['success' => true]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auction;
+use App\Models\Bid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,126 +12,94 @@ class AuctionController extends Controller
     // Show all auctions with their bids
     public function index()
     {
-        $auctions = Auction::with('bids')->get(); // Load bids with auctions
+        $auctions = Auction::with('bids')->get();
         return view('auctions.index', compact('auctions'));
     }
 
-    // Show the auction creation form (only sellers can see this)
+    // Show auction form (only for sellers)
     public function create()
     {
-        if (Auth::user()->role !== 'seller') {
-            abort(403, 'Only sellers can create auctions.');
-        }
-
+        abort_if(Auth::user()->role !== 'seller', 403);
         return view('auctions.create');
     }
 
-    // Save a new auction (only sellers can store )
-    public function store(Request $request)
+    // Save new auction
+    public function store(Request $r)
     {
-        if (Auth::user()->role !== 'seller') {
-            abort(403, 'Only sellers can create auctions.');
-        }
+        abort_if(Auth::user()->role !== 'seller', 403);
 
-        $request->validate([
-            'title' => 'required|string',
+        $r->validate([
+            'title' => 'required',
             'starting_price' => 'required|numeric|min:1',
-            'auction_start' => 'nullable|date',
-            'auction_end' => 'nullable|date|after_or_equal:auction_start',
+
         ]);
 
-      
         Auction::create([
-            'title' => $request->title,
-            'starting_price' => $request->starting_price,
+            'title' => $r->title,
+            'starting_price' => $r->starting_price,
             'user_id' => Auth::id(),
-            'auction_start' => now(),            // start now
-            'auction_end' => now()->addHours(1), // end 1 hour later 
-            'status' => 'started',               // immediately active
+            'auction_start' => now(),
+            'auction_end' => now()->addHour(),
+            'status' => 'started',
         ]);
 
 
-        return redirect()->route('auctions.index')->with('success', 'Auction created successfully!');
+        return back()->with('success', 'Auction created!');
     }
 
-    // Show details of a single auction
+    // Show single auction
     public function show($id)
     {
         $auction = Auction::with('bids')->findOrFail($id);
         return view('auctions.show', compact('auction'));
     }
 
-    // Show edit form (only the seller who created it can edit)
+    // Edit auction (only owner)
     public function edit($id)
     {
         $auction = Auction::findOrFail($id);
-
-        if (Auth::id() !== $auction->user_id) {
-            abort(403, 'You are not allowed to edit this auction.');
-        }
-
+        abort_if(Auth::id() !== $auction->user_id, 403);
         return view('auctions.edit', compact('auction'));
     }
 
-    // Update an auction (only the owner can update)
-    public function update(Request $request, $id)
+    // Update auction
+    public function update(Request $r, $id)
     {
         $auction = Auction::findOrFail($id);
+        abort_if(Auth::id() !== $auction->user_id, 403);
 
-        if (Auth::id() !== $auction->user_id) {
-            abort(403, 'You are not allowed to update this auction.');
-        }
-
-        $request->validate([
-            'title' => 'required|string',
+        $r->validate([
+            'title' => 'required',
             'starting_price' => 'required|numeric|min:1',
-            'auction_start' => 'nullable|date',
-            'auction_end' => 'nullable|date|after_or_equal:auction_start',
+            
         ]);
 
-        $auction->update([
-            'title' => $request->title,
-            'starting_price' => $request->starting_price,
-            'auction_start' => $request->auction_start,
-            'auction_end' => $request->auction_end,
-        ]);
+        $auction->update($r->only('title', 'starting_price', 'auction_start', 'auction_end'));
 
-        return redirect()->route('auctions.index')->with('success', 'Auction updated successfully!');
+        return back()->with('success', 'Auction updated!');
     }
 
-    // Delete an auction (only the owner can delete)
+    // Delete auction
     public function destroy($id)
     {
         $auction = Auction::findOrFail($id);
-
-        if (Auth::id() !== $auction->user_id) {
-            abort(403, 'You are not allowed to delete this auction.');
-        }
-
+        abort_if(Auth::id() !== $auction->user_id, 403);
         $auction->delete();
-
-        return redirect()->route('auctions.index')->with('success', 'Auction deleted successfully!');
+        return back()->with('success', 'Auction deleted!');
     }
+
+    // Accept a bid (only seller)
     public function acceptBid($bidId)
-{
-    $bid = \App\Models\Bid::findOrFail($bidId);
-    $auction = $bid->auction;
+    {
+        $bid = Bid::findOrFail($bidId);
+        $auction = $bid->auction;
 
-    // Only seller can accept
-    if (auth()->id() !== $auction->user_id) {
-        abort(403, 'You are not allowed to accept this bid.');
+        abort_if(Auth::id() !== $auction->user_id, 403);
+
+        $auction->bids()->update(['winner' => 0]); // reset all
+        $bid->update(['winner' => 1]); // set this one as winner
+        $auction->update(['status' => 'sold']); // mark as sold
+
+        return back()->with('success', 'Bid accepted!');
     }
-
-    // Reset all bids to winner = 0 (one line)
-    $auction->bids()->update(['winner' => 0]);
-
-    // Set this bid as winner
-    $bid->update(['winner' => 1]);
-
-    // Mark auction as sold
-    $auction->update(['status' => 'sold']);
-
-    return redirect()->back()->with('success', 'Bid accepted successfully!');
-}
-
 }
