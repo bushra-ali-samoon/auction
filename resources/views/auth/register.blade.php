@@ -27,22 +27,37 @@
   </form>
 
  <script>
+// When the register form is submitted
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
+
+    // Stop the form from reloading the page (default browser behavior)
     e.preventDefault();
 
+    // Collect all form data including inputs, files, and CSRF token
     let formData = new FormData(e.target);
 
+    // Send the form data to the server using AJAX (without page reload)
     let res = await fetch("{{ route('register.submit') }}", {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': formData.get('_token') },
-        body: formData
+        method: 'POST', // we’re sending data, so we use POST
+        headers: { 
+            // CSRF token for  security check
+            'X-CSRF-TOKEN': formData.get('_token') 
+        },
+        body: formData // attach the form data
     });
 
+    // If the server responds successfully  
     if (res.ok) {
+        // Show a success message in green
         document.getElementById('msg').style.color = 'green';
         document.getElementById('msg').textContent = 'Registered successfully!';
+
+        // Clear the form after successful registration
         e.target.reset();
-    } else {
+    } 
+    // If something goes wrong  
+    else {
+        // Show an error message in red
         document.getElementById('msg').style.color = 'red';
         document.getElementById('msg').textContent = 'Something went wrong!';
     }
