@@ -1,47 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Messages with {{ $partner->name }}</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <h2>Chat with {{ $partner->name }}</h2>
+@extends('layouts.app')
+@section('title', 'Create Auction')
 
-    <div id="chat-box" style="border:1px solid #ccc; padding:10px; height:250px; overflow-y:auto;">
-        @foreach($messages as $msg)
-            <p>
-                <strong>{{ $msg->sender_id == auth()->id() ? 'You' : $partner->name }}:</strong>
-                {{ $msg->message }}
-            </p>
-        @endforeach
-    </div>
- 
-    <form id="messageForm">
-        @csrf
-        <input type="hidden" name="receiver_id" value="{{ $id }}">
-        <textarea name="message" placeholder="Type your message" required></textarea><br>
-        <button type="submit">Send</button>
-    </form>
- 
-    <script>
-        $('#messageForm').submit(function(e){
-            e.preventDefault();
+@section('content')
+<h2>Create New Auction</h2>
 
-            $.ajax({
-                url: "{{ route('messages.store') }}",
-                type: "POST",
-                data: $(this).serialize(),
-                success: function(res){
-                    if(res.success){
-                        const msg = $('textarea[name="message"]').val();
-                        $('#chat-box').append(`<p><strong>You:</strong> ${msg}</p>`);
-                        $('textarea[name="message"]').val('');
-                        $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
-                    }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+<form id="auctionForm">
+    @csrf
+    <input type="text" name="title" placeholder="Title" required class="form-control mb-2">
+    <input type="number" name="starting_price" placeholder="Starting Price" step="0.01" required class="form-control mb-2">
+    <input type="datetime-local" name="auction_start" class="form-control mb-2">
+    <input type="datetime-local" name="auction_end" class="form-control mb-2">
+    <button class="btn btn-primary">Create</button>
+    <a href="{{ route('auctions.index') }}" class="btn btn-secondary">Back</a>
+</form>
 
+<script>
+document.querySelector('#auctionForm').onsubmit = async e => {
+    e.preventDefault();
+    let res = await fetch("{{ route('auctions.store') }}", {
+        method: 'POST',
+        headers: {'X-CSRF-TOKEN': document.querySelector('[name=_token]').value},
+        body: new FormData(e.target)
+    });
+    if(res.ok) location.href = "{{ route('auctions.index') }}";
+    else alert('Error!');
+};
+</script>
+
+@endsection
