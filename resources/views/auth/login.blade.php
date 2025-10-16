@@ -22,40 +22,32 @@
   </form>
 
 <script>
-// When the login form is submitted
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+$('#loginForm').submit(function(e){
+    e.preventDefault(); // Stop page reload
 
-    // Prevent the default form submission (which reloads the page)
-    e.preventDefault();
+    var form = this;
+    var data = new FormData(form); // Collect all form inputs
 
-    // Collect all the form data (like email, password, CSRF token)
-    let formData = new FormData(e.target);
+    $.ajax({
+        url: "{{ route('login.submit') }}",
+        method: "POST",
+        data: data,
+        contentType: false,  // Needed for FormData
+        processData: false,  // Prevent jQuery from processing the data
+        headers: {'X-CSRF-TOKEN': data.get('_token')}, // CSRF token for security
 
-    // Send an AJAX request to the Laravel login route
-    let res = await fetch("{{ route('login.submit') }}", {
-        method: 'POST', //   sending data to the server
-        headers: { 
-            //  CSRF token for security verification
-            'X-CSRF-TOKEN': formData.get('_token') 
+        success: function(){
+            // Show success message in green
+            $('#msg').css('color','green').text('Login successful!');
+            // Redirect to home page after 1 second
+            setTimeout(function(){ window.location.href = "{{ route('home') }}"; }, 1000);
         },
-        body: formData // Attach all form fields to the request
+
+        error: function(){
+            // Show error message in red
+            $('#msg').css('color','red').text('Invalid email or password!');
+        }
     });
-
-    // If the login is successful  
-    if (res.ok) {
-        // Show a green success message
-        document.getElementById('msg').style.color = 'green';
-        document.getElementById('msg').textContent = 'Login successful!';
-
-        // After 1 second, redirect the user to the home page
-        setTimeout(() => window.location.href = "{{ route('home') }}", 1000);
-    } 
-    // If the login fails (wrong email or password)
-    else {
-        // Show a red error message
-        document.getElementById('msg').style.color = 'red';
-        document.getElementById('msg').textContent = 'Invalid email or password!';
-    }
 });
 </script>
 

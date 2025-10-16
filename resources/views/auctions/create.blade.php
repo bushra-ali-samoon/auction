@@ -13,24 +13,26 @@
     <button class="btn btn-primary">Create</button>
     <a href="{{ route('auctions.index') }}" class="btn btn-secondary">Back</a>
 </form>
-@endsection
+
 <script>
+// When the auction form is submitted
 document.querySelector('#auctionForm').onsubmit = async e => {
-    e.preventDefault();
+    e.preventDefault(); // Stop the page from reloading
+
+    // Send the form data to the server using fetch method in AJAX
     let res = await fetch("{{ route('auctions.store') }}", {
-        method: 'POST',
-        headers: {'X-CSRF-TOKEN': e.target._token.value},
-        body: new FormData(e.target)
+        method: 'POST', // Send data using POST method
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('[name=_token]').value // Include CSRF token for security
+        },
+        body: new FormData(e.target) //Send all input values (important!)
     });
-    let msg = document.getElementById('msg');
-    if(res.ok){
-        msg.style.color='green';
-        msg.textContent='Auction created!';
-        e.target.reset();
-        setTimeout(()=>location.href="{{ route('auctions.index') }}",1000);
-    } else {
-        msg.style.color='red';
-        msg.textContent='Error! Try again.';
-    }
+
+    // Check if the server responded successfully
+    if(res.ok)
+        location.href = "{{ route('auctions.index') }}"; // Redirect to auctions list page
+    else
+        alert('Error!'); // Show an error if saving failed
 };
 </script>
+@endsection

@@ -35,7 +35,12 @@
             <td>
                 <a href="{{ route('auctions.show', $auction->id) }}" class="btn btn-info btn-sm">View</a>
                 <a href="{{ route('auctions.edit', $auction->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <button class="btn btn-danger btn-sm deleteAuction" data-id="{{ $auction->id }}">Delete</button>
+                <form action="{{ route('auctions.destroy', $auction->id) }}" method="POST" style="display:inline;">
+    @csrf
+    @method('DELETE')
+    <button class="btn btn-danger btn-sm">Delete</button>
+</form>
+
             </td>
         </tr>
         @endforeach

@@ -26,43 +26,38 @@
       <button type="submit">Register</button>
   </form>
 
- <script>
+<script>
 // When the register form is submitted
-document.getElementById('registerForm').addEventListener('submit', async (e) => {
+$('#registerForm').submit(function(e){
+    e.preventDefault(); // Stop the page from reloading
 
-    // Stop the form from reloading the page (default browser behavior)
-    e.preventDefault();
+    var form = this;               // Reference to the form
+    var data = new FormData(form); // Collect all form inputs
 
-    // Collect all form data including inputs, files, and CSRF token
-    let formData = new FormData(e.target);
+    // Send form data to the server using AJAX
+    $.ajax({
+        url: "{{ route('register.submit') }}", // Laravel route
+        method: "POST",                        // HTTP POST request
+        data: data,                             // Form data
+        contentType: false,                     // Needed for FormData
+        processData: false,                     // Prevent jQuery from processing data
+        headers: {'X-CSRF-TOKEN': data.get('_token')}, // CSRF token for security
 
-    // Send the form data to the server using AJAX (without page reload)
-    let res = await fetch("{{ route('register.submit') }}", {
-        method: 'POST', // we’re sending data, so we use POST
-        headers: { 
-            // CSRF token for  security check
-            'X-CSRF-TOKEN': formData.get('_token') 
+        success: function(){
+            // If registration is successful
+            $('#msg').css('color','green').text('Registered successfully!');
+            form.reset(); // Clear the form inputs
         },
-        body: formData // attach the form data
+
+        error: function(){
+            // If there is an error
+            $('#msg').css('color','red').text('Something went wrong!');
+        }
     });
-
-    // If the server responds successfully  
-    if (res.ok) {
-        // Show a success message in green
-        document.getElementById('msg').style.color = 'green';
-        document.getElementById('msg').textContent = 'Registered successfully!';
-
-        // Clear the form after successful registration
-        e.target.reset();
-    } 
-    // If something goes wrong  
-    else {
-        // Show an error message in red
-        document.getElementById('msg').style.color = 'red';
-        document.getElementById('msg').textContent = 'Something went wrong!';
-    }
 });
 </script>
+
+
 
 </body>
 </html>
