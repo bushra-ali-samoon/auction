@@ -14,3 +14,23 @@
     <a href="{{ route('auctions.index') }}" class="btn btn-secondary">Back</a>
 </form>
 @endsection
+<script>
+document.querySelector('#auctionForm').onsubmit = async e => {
+    e.preventDefault();
+    let res = await fetch("{{ route('auctions.store') }}", {
+        method: 'POST',
+        headers: {'X-CSRF-TOKEN': e.target._token.value},
+        body: new FormData(e.target)
+    });
+    let msg = document.getElementById('msg');
+    if(res.ok){
+        msg.style.color='green';
+        msg.textContent='Auction created!';
+        e.target.reset();
+        setTimeout(()=>location.href="{{ route('auctions.index') }}",1000);
+    } else {
+        msg.style.color='red';
+        msg.textContent='Error! Try again.';
+    }
+};
+</script>
