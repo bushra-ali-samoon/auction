@@ -89,17 +89,22 @@ class AuctionController extends Controller
     }
 
     // Accept a bid (only seller)
-    public function acceptBid($bidId)
-    {
-        $bid = Bid::findOrFail($bidId);
-        $auction = $bid->auction;
+    public function acceptBid($id)
+{
+    $bid = Bid::find($id);
 
-        abort_if(Auth::id() !== $auction->user_id, 403);
+    if ($bid) {
+        // Set all other bids of this auction to 0 first
+        Bid::where('auction_id', $bid->auction_id)->update(['winner' => 0]);
 
-        $auction->bids()->update(['winner' => 0]); // reset all
-        $bid->update(['winner' => 1]); // set this one as winner
-        $auction->update(['status' => 'sold']); // mark as sold
+        // Then mark this one as the winner
+        $bid->winner = 1;
+        $bid->save();
 
-        return back()->with('success', 'Bid accepted!');
+        return response()->json(['success' => true]);
     }
+
+    return response()->json(['success' => false]);
+}
+
 }

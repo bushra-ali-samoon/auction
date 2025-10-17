@@ -23,32 +23,32 @@
         <button type="submit">Send</button>
     </form>
  
-   <script>
+<script>
 $('#messageForm').submit(function(e){
-    e.preventDefault(); // Stop the page from reloading on form submit
+    e.preventDefault(); // Stop page reload
 
     $.ajax({
-        url: "{{ route('messages.store') }}", // Laravel route to store messages
-        type: "POST",                          // HTTP POST request
-        data: $(this).serialize(),             // Serialize form data (convert inputs into URL-encoded string)
+        url: "{{ route('messages.store') }}", // Send data to this route
+        type: "POST", // Use POST request
+        data: $(this).serialize(), // Get form data
         success: function(res){
             if(res.success){
-                // Get the message text from the textarea
-                const msg = $('textarea[name="message"]').val();
+                const msg = $('textarea[name="message"]').val(); // Get message text
 
-                // Append the new message to the chat box with "You:" label
+                // Add new message in chat box
                 $('#chat-box').append(`<p><strong>You:</strong> ${msg}</p>`);
 
-                // Clear the textarea after sending
+                // Clear input box
                 $('textarea[name="message"]').val('');
 
-                // Scroll chat box to the bottom so the new message is visible
+                // Scroll to latest message
                 $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
             }
         }
     });
 });
 </script>
+
 
 </body>
 </html> 

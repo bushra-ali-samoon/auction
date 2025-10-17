@@ -36,7 +36,7 @@ $('#registerForm').submit(function(e){
 
     // Send form data to the server using AJAX
     $.ajax({
-        url: "{{ route('register.submit') }}", // Laravel route
+        url: "{{ route('register.submit') }}", //route
         method: "POST",                        // HTTP POST request
         data: data,                             // Form data
         contentType: false,                     // Needed for FormData
