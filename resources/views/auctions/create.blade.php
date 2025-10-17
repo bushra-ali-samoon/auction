@@ -15,24 +15,27 @@
 </form>
 
 <script>
-// When the auction form is submitted
-document.querySelector('#auctionForm').onsubmit = async e => {
-    e.preventDefault(); // Stop the page from reloading
+$('#auctionForm').submit(function(e){
+    e.preventDefault(); // Stop page reload
 
-    // Send the form data to the server using fetch method in AJAX
-    let res = await fetch("{{ route('auctions.store') }}", {
-        method: 'POST', // Send data using POST method
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('[name=_token]').value // Include CSRF token for security
+    $.ajax({
+        url: "{{ route('auctions.store') }}", // route to save auction
+        type: "POST", // Sending data using POST
+        data: new FormData(this), // Get all form data
+        contentType: false, // Important for file/form data
+        processData: false, // Don't process form data automatically
+        headers: {'X-CSRF-TOKEN': $('[name=_token]').val()}, // Security token
+        success: function(){
+            // If success, go back to auction list page
+            window.location.href = "{{ route('auctions.index') }}";
         },
-        body: new FormData(e.target) //Send all input values (important!)
+        error: function(){
+            // If something goes wrong
+            alert('Error!');
+        }
     });
-
-    // Check if the server responded successfully
-    if(res.ok)
-        location.href = "{{ route('auctions.index') }}"; // Redirect to auctions list page
-    else
-        alert('Error!'); // Show an error if saving failed
-};
+});
 </script>
-@endsection
+
+
+ @endsection
