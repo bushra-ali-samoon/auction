@@ -35,12 +35,7 @@
             <td>
                 <a href="{{ route('auctions.show', $auction->id) }}" class="btn btn-info btn-sm">View</a>
                 <a href="{{ route('auctions.edit', $auction->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <form action="{{ route('auctions.destroy', $auction->id) }}" method="POST" style="display:inline;">
-    @csrf
-    @method('DELETE')
-    <button class="btn btn-danger btn-sm">Delete</button>
-</form>
-
+                <button class="btn btn-danger btn-sm deleteAuction" data-id="{{ $auction->id }}">Delete</button>
             </td>
         </tr>
         @endforeach
@@ -49,4 +44,38 @@
 @else
 <p>No auctions found.</p>
 @endif
+
+<script>
+$(document).ready(function() {
+
+    // When Delete button is clicked
+    $('.deleteAuction').click(function(e) {
+        e.preventDefault();
+
+        // Ask for confirmation
+        if(!confirm('Are you sure you want to delete this auction?')) return;
+
+        // Get auction ID from button
+        let id = $(this).data('id');
+
+        // AJAX request to delete auction
+        $.ajax({
+            url: '/auctions/' + id,
+            method: 'POST', // Laravel uses POST with _method=DELETE
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                _method: 'DELETE'
+            },
+            success: function() {
+                alert('Auction deleted successfully!');
+                $('#auction-' + id).remove(); // Remove deleted row
+            },
+            error: function() {
+                alert('Failed to delete auction!');
+            }
+        });
+    });
+
+});
+</script>
 @endsection
