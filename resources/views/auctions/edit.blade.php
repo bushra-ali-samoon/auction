@@ -15,21 +15,25 @@
 </form>
 
 <script>
-// When edit form is submitted
-document.querySelector('#editForm').onsubmit = async e => {
-    e.preventDefault(); // Stop page reload
+$('#editForm').submit(function(e){
+    e.preventDefault(); // Stop form from reloading
 
-    // Send updated data to Laravel
-    let res = await fetch("{{ route('auctions.update', $auction->id) }}", {
-        method: 'POST', //it needs POST when using _method=PUT
-        headers: { 'X-CSRF-TOKEN': document.querySelector('[name=_token]').value },
-        body: new FormData(e.target)
+    $.ajax({
+        url: "{{ route('auctions.update', $auction->id) }}",
+        type: 'POST',
+        data: new FormData(this),
+        processData: false,
+        contentType: false,
+        headers: {'X-CSRF-TOKEN': $('[name=_token]').val()},
+        success: function(){
+            alert('Auction updated!');
+            window.location.href = "{{ route('auctions.index') }}";
+        },
+        error: function(){
+            alert('Update failed!');
+        }
     });
-
-    if(res.ok)
-        location.href = "{{ route('auctions.index') }}"; // Go back to list after update
-    else
-        alert('Update failed!');
-};
+});
 </script>
+
 @endsection
