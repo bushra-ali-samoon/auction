@@ -27,6 +27,7 @@ Route::post('/auctions/{auction}/bid', [BidController::class, 'store'])->name('b
 Route::get('/bids/{bid}/accept', [AuctionController::class, 'acceptBid'])->name('bids.accept');
 Route::view('/home', 'home')->name('home');
  Route::post('/auctions', [AuctionController::class, 'store'])->name('auctions.store');
+Route::delete('/auctions/{id}', [AuctionController::class, 'destroy'])->name('auctions.destroy');
 
 
 

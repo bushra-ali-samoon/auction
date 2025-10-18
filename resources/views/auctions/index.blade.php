@@ -35,7 +35,9 @@
             <td>
                 <a href="{{ route('auctions.show', $auction->id) }}" class="btn btn-info btn-sm">View</a>
                 <a href="{{ route('auctions.edit', $auction->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <button class="btn btn-danger btn-sm deleteAuction" data-id="{{ $auction->id }}">Delete</button>
+<button class="btn btn-danger btn-sm deleteAuction" data-id="{{ $auction->id }}">
+    Delete
+</button>
             </td>
         </tr>
         @endforeach
@@ -47,31 +49,33 @@
 
 <script>
 $(function(){
+    // When delete button is clicked
+    $('.deleteAuction').click(function(e){
+        e.preventDefault(); // Stop default link action
 
-  // When the delete button is clicked
-  $('.deleteAuction').click(function(e){
-    e.preventDefault();
+        if(!confirm('Are you sure you want to delete this auction?')) return;
 
-    // Confirm before deleting
-    if(!confirm('Delete this auction?')) return;
+        let id = $(this).data('id');
 
-    let id = $(this).data('id'); // Get auction ID
-
-    // Send delete request
-    $.post('/auctions/' + id, {
-      _token: $('meta[name="csrf-token"]').attr('content'),
-      _method: 'DELETE'
-    })
-    .done(function(){
-      alert('Auction deleted!');
-      $('#auction-' + id).remove(); // Remove it from page
-    })
-    .fail(function(){
-      alert('Delete failed!');
+        $.ajax({
+            url: '/auctions/' + id,       // Laravel delete route
+            type: 'POST',                 // Use POST with method spoofing
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                _method: 'DELETE'         // Laravel understands this as DELETE
+            },
+            success: function(res){
+                alert('Auction deleted successfully!');
+                $('#auction-' + id).remove(); // Remove deleted row
+            },
+            error: function(xhr){
+                console.log(xhr.responseText);
+                alert('Failed to delete auction!');
+            }
+        });
     });
-  });
-
 });
 </script>
+
 
 @endsection
