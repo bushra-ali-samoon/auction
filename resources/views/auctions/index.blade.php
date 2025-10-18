@@ -46,36 +46,32 @@
 @endif
 
 <script>
-$(document).ready(function() {
+$(function(){
 
-    // When Delete button is clicked
-    $('.deleteAuction').click(function(e) {
-        e.preventDefault();
+  // When the delete button is clicked
+  $('.deleteAuction').click(function(e){
+    e.preventDefault();
 
-        // Ask for confirmation
-        if(!confirm('Are you sure you want to delete this auction?')) return;
+    // Confirm before deleting
+    if(!confirm('Delete this auction?')) return;
 
-        // Get auction ID from button
-        let id = $(this).data('id');
+    let id = $(this).data('id'); // Get auction ID
 
-        // AJAX request to delete auction
-        $.ajax({
-            url: '/auctions/' + id,
-            method: 'POST', // Laravel uses POST with _method=DELETE
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content'),
-                _method: 'DELETE'
-            },
-            success: function() {
-                alert('Auction deleted successfully!');
-                $('#auction-' + id).remove(); // Remove deleted row
-            },
-            error: function() {
-                alert('Failed to delete auction!');
-            }
-        });
+    // Send delete request
+    $.post('/auctions/' + id, {
+      _token: $('meta[name="csrf-token"]').attr('content'),
+      _method: 'DELETE'
+    })
+    .done(function(){
+      alert('Auction deleted!');
+      $('#auction-' + id).remove(); // Remove it from page
+    })
+    .fail(function(){
+      alert('Delete failed!');
     });
+  });
 
 });
 </script>
+
 @endsection
