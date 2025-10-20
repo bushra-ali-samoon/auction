@@ -80,7 +80,7 @@ class AuctionController extends Controller
     }
 
     // Delete auction
-    public function destroy($id)
+  public function destroy($id)
 {
     $auction = Auction::findOrFail($id);
     abort_if(Auth::id() !== $auction->user_id, 403);
@@ -88,6 +88,7 @@ class AuctionController extends Controller
 
     return response()->json(['success' => true]);
 }
+
 
     // Accept a bid (only seller)
     public function acceptBid($id)

@@ -46,36 +46,36 @@
 @else
 <p>No auctions found.</p>
 @endif
-
 <script>
-$(function(){
-    // When delete button is clicked
-    $('.deleteAuction').click(function(e){
-        e.preventDefault(); // Stop default link action
+$(document).on('click', '.deleteAuction', function(e) {
+    e.preventDefault();
 
-        if(!confirm('Are you sure you want to delete this auction?')) return;
+    if (!confirm('Are you sure you want to delete this auction?')) return;
 
-        let id = $(this).data('id');
+    let id = $(this).data('id');
 
-        $.ajax({
-            url: '/auctions/' + id,       // Laravel delete route
-            type: 'POST',                 // Use POST with method spoofing
-            data: {
-                _token: $('meta[name="csrf-token"]').attr('content'),
-                _method: 'DELETE'         // Laravel understands this as DELETE
-            },
-            success: function(res){
+    $.ajax({
+        url: '/auctions/' + id,
+        type: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+            if (response.success) {
                 alert('Auction deleted successfully!');
-                $('#auction-' + id).remove(); // Remove deleted row
-            },
-            error: function(xhr){
-                console.log(xhr.responseText);
+                $('#auction-' + id).fadeOut(400, function() { $(this).remove(); });
+            } else {
                 alert('Failed to delete auction!');
             }
-        });
+        },
+        error: function(xhr) {
+            console.error(xhr.responseText);
+            alert('Error deleting auction! Check console.');
+        }
     });
 });
 </script>
+
 
 
 @endsection
